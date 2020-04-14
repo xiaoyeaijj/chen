@@ -1,263 +1,101 @@
 <template> 
   <div class="app-container">
-    <el-card class="operate-container" shadow="never">
+    <el-card class="operate-container"
+             shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>审批详情</span>
+      <span>{{this.$route.params.apply_name||'发起申请'}}</span>
     </el-card>
-    <div class="table-container">
-      <el-table ref="returnApplyTable"
-                :data="list"
-                style="width: 100%;"
-                @selection-change="handleSelectionChange"
-                v-loading="listLoading" border>
-        <el-table-column label="活动名称" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.rank}}</template>
-        </el-table-column>
-        <el-table-column label="申请人" align="center">
-          <template slot-scope="scope">{{scope.row.shop_name}}</template>
-        </el-table-column>
-        <el-table-column label="申请时间" align="center">
-          <template slot-scope="scope">{{scope.row.shop_pic}}</template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
-        :current-page.sync="listQuery.pageNum"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :total="total">
-      </el-pagination>
-    </div>
+    <el-form ref="form"
+             :model="form"
+             label-width="80px"
+             style="margin-top:20px;">
+      <el-form-item label="申请人">
+        <el-input v-model="form.name"></el-input>
+      </el-form-item>
+      <el-form-item label="申请时间">
+        <el-col :span="8">
+          <el-date-picker placeholder="选择日期"
+                          v-model="form.date"
+                          type="daterange"
+                          value-format="yyyy-MM-dd"
+                          range-separator="至"
+                          start-placeholder="开始日期"
+                          end-placeholder="结束日期"
+                          style="width: 100%;"></el-date-picker>
+        </el-col>
+        <el-col :span="8">
+          <el-time-picker v-model="form.time"
+                          is-range
+                          value-format="HH:mm:ss"
+                          range-separator="至"
+                          start-placeholder="开始时间"
+                          end-placeholder="结束时间"
+                          placeholder="选择时间范围"
+                          style="width: 100%;"></el-time-picker>
+        </el-col>
+      </el-form-item>
+      <el-form-item label="申请原因">
+        <el-input type="textarea"
+                  v-model="form.desc"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary"
+                   @click="onSubmit">提交申请</el-button>
+        <el-button>取消</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 <script>
-  import {formatDate} from '@/utils/date';
-  import {fetchList,deleteApply,updateReason,addReason,SearchList} from '@/api/hotShop';
-  import {deleteReason} from "../../../api/hotShop";
-  const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
-    id: null,
-    receiverKeyword: null,
-    status: null,
-    createTime: null,
-    handleMan: null,
-    handleTime: null
-  };
-  const defaultReturnReason = {
-    student_id:"",
-    real_name:"",
-    mobile:"",
-    college:"",
-  };
-  const defaultStatusOptions=[
-    {
-      label: '益禾堂',
-      value: "11ea-2ef5-8d58-70188b39697a-44a2fd0e"
-    },
-    {
-      label: '码头1978',
-      value: "11ea-2f7f-ba88-70188b39697a-58316328"
-    },
-    {
-      label: '铁饭碗',
-      value: "11ea-2f7f-ba88-70188b39697a-9c44af25"
-    },
-    {
-      label: '韩拾林',
-      value: "11ea-2f7f-ba88-70188b39697a-d1641846"
-    }
-  ];
+  import request from '@/utils/request'
   export default {
-    name:'returnApplyList',
-    data() {
+    name: 'returnApplyList',
+    data () {
       return {
-        search:{
-          keyword:""
-        },
-        listQuery:Object.assign({},defaultListQuery),
-        statusOptions: Object.assign({},defaultStatusOptions),
-        list:null,
-        total:null,
-        listLoading:false,
-        multipleSelection:[],
-        operateType:1,
-        operateOptions: [
-          {
-            label: "批量删除",
-            value: 1
-          }
-        ],
-        dialogVisible:false,
-        returnReason:Object.assign({},defaultReturnReason),
+        form: {
+          name: '',
+          date: '',
+          time: '',
+          desc: ''
+        }
       }
     },
-    created(){
-      this.getList();
+    created () {
     },
-    filters:{
-      formatTime(time) {
-        if(time==null||time===''){
-          return 'N/A';
+    filters: {
+    },
+    methods: {
+      onSubmit () {
+        let apply_detail = {
+          apply_name: this.form.name,
+          apply_date: this.form.date,
+          apply_time: this.form.time,
+          apply_reason: this.form.desc
         }
-        let date = new Date(time);
-        return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
-      },
-      formatStatus(status){
-        for(let i=0;i<defaultStatusOptions.length;i++){
-          if(status===defaultStatusOptions[i].value){
-            return defaultStatusOptions[i].label;
+        let params = {
+          wfid: this.$route.params.apply_id,
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          datajson: JSON.stringify(apply_detail),
+          verify: 2
+        }
+        request({
+          url: '/escalice/admin/WorkflowInstance/edit',
+          method: 'post',
+          data: params
+        }).then(res => {
+          if (res.code == 200) {
+            this.$message({ type: 'success', message: '提交申请成功' })
           }
-        }
-      },
-      formatReturnAmount(row){
-        return row.productRealPrice*row.productCount;
-      }
-    },
-    methods:{
-      handleAdd() {
-        this.dialogVisible=true;
-        this.operateReasonId=null;
-        this.returnReason=Object.assign({},defaultReturnReason);
-      },
-      handleSelectionChange(val){
-        this.multipleSelection = val;
-      },
-      handleResetSearch() {
-        this.listQuery = Object.assign({}, defaultListQuery);
-      },
-      handleSearchList() {
-        this.listQuery.pageNum = 1;
-        this.getList();
-      },
-      handleViewDetail(index,row){
-        this.$router.push({path:'/oms/returnApplyDetail',query:{id:row.id}})
-      },
-      // handleBatchOperate(){
-      //   if(this.multipleSelection==null||this.multipleSelection.length<1){
-      //     this.$message({
-      //       message: '请选择要操作的申请',
-      //       type: 'warning',
-      //       duration: 1000
-      //     });
-      //     return;
-      //   }
-      //   if(this.operateType===1){
-      //     //批量删除
-      //     this.$confirm('是否要进行删除操作?', '提示', {
-      //       confirmButtonText: '确定',
-      //       cancelButtonText: '取消',
-      //       type: 'warning'
-      //     }).then(() => {
-      //       let params = new URLSearchParams();
-      //       let ids=[];
-      //       for(let i=0;i<this.multipleSelection.length;i++){
-      //         ids.push(this.multipleSelection[i].id);
-      //       }
-      //       params.append("ids",ids);
-      //       deleteApply(params).then(response=>{
-      //         this.getList();
-      //         this.$message({
-      //           type: 'success',
-      //           message: '删除成功!'
-      //         });
-      //       });
-      //     })
-      //   }
-      // },
-      handleSizeChange(val){
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
-      },
-      handleUpdate(index, row){
-        this.dialogVisible=true;
-        this.operateReasonId=row.id;
-        this.returnReason=row;
-
-      },
-      handleConfirm(){
-        if(this.operateReasonId==null){
-          //添加操作
-          addReason(this.returnReason).then(response=>{
-            this.dialogVisible=false;
-            this.operateReasonId=null;
-            this.$message({
-              message: '添加成功！',
-              type: 'success',
-              duration:1000
-            });
-            this.getList();
-          });
-        }else{
-          //编辑操作
-
-          updateReason(this.returnReason).then(response=>{
-            this.dialogVisible=false;
-            this.operateReasonId=null;
-            this.$message({
-              message: '修改成功！',
-              type: 'success',
-              duration:1000
-            });
-            this.getList();
-          });
-        }
-      },
-      handleCurrentChange(val){
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
-      getList(){
-        this.listLoading=true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
-      },
-      handleSearchList() {
-
-
-        SearchList(this.search).then(response=>{
-          this.list=response.data.list;
-
-        });
-
-      },
-      deleteReason(index, row){
-        this.$confirm('是否要进行该删除操作?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-
-          deleteReason(row).then(response=>{
-            this.$message({
-              message: '删除成功！',
-              type: 'success',
-              duration: 1000
-            });
-
-            this.getList();
-          });
         })
-      },
+      }
     }
   }
 
 </script>
 <style scoped>
-
   .input-width {
     width: 203px;
   }
-
 </style>
 
 

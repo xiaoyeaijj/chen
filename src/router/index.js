@@ -43,7 +43,7 @@ export const constantRouterMap = [
         path: 'workflow_qjsq',
         name: 'workflow_qjsq',
         component: () => import('@/views/oms/report/workflow-QJ'),
-        meta: { title: '请假申请', icon: 'sms-hot' }
+        meta: { title: '发起申请', icon: 'sms-hot' }
       },
       {
         path: 'workflow_hdsq',
@@ -65,28 +65,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
-  // {
-  //   path: '/promotion/shop',
-  //   component: Layout,
-  //   redirect: '/promotion/shop/shop_base_list',
-  //   name: 'shop',
-  //   meta: {title: '门店管理', icon: 'order'},
-  //   children: [
-  //     {
-  //       path: 'shop_base_list',
-  //       name: 'shop_base_list',
-  //       component: () => import('@/views/oms/order/index'),
-  //       meta: {title: '门店列表', icon: 'product-list'}
-  //     },
-  //     {
-  //       path: 'shop_type_list',
-  //       name: 'shop_type_list',
-  //       component: () => import('@/views/oms/apply/reason'),
-  //       meta: {title: '门店类型', icon: 'order-return-reason'}
-  //     }
-  //   ]
-  // },
 
 
   {
