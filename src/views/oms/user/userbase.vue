@@ -30,11 +30,43 @@
                   v-model="form.useraccount"></el-input>
       </el-form-item>
       <el-button type="primary"
-                 @click="onSubmit">修改资料</el-button>
+                 @click="openUpdateDialog">修改资料</el-button>
       <el-button type="primary"
                  @click="dialogFormVisible = true">修改密码</el-button>
       </el-form-item>
     </el-form>
+
+    <el-dialog title="修改个人信息"
+               :visible.sync="editDialogFormVisible">
+      <el-form :model="editForm">
+        <el-form-item label="用户姓名"
+                      label-width="120px">
+          <el-input v-model="editForm.username"
+                    autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="用户性别"
+                      label-width="120px">
+          <el-input v-model="editForm.usersex"
+                    autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="用户电话"
+                      label-width="120px">
+          <el-input v-model="editForm.userphone"
+                    autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="用户邮箱"
+                      label-width="120px">
+          <el-input v-model="editForm.useremail"
+                    autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="updateUserInfo">确 定</el-button>
+      </div>
+    </el-dialog>
 
     <el-dialog title="收货地址"
                :visible.sync="dialogFormVisible">
@@ -105,7 +137,15 @@
           useremail: 'chen@heywoods.cn',
           useraccount: 'student'
         },
+        editForm: {
+          username: '',
+          usersex: '',
+          userphone: '',
+          useremail: '',
+          useraccount: ''
+        },
         dialogFormVisible: false,
+        editDialogFormVisible: false,
         ruleForm: {
           oldPass: '',
           pass: '',
@@ -122,10 +162,10 @@
       }
     },
     created () {
-      this.getList();
+      this.initUserInfo();
     },
     methods: {
-      getList () {
+      initUserInfo () {
         let params = {
           userid: '11ea-2f09-b8b8-70188b39697a-b8725543'
         }
@@ -135,6 +175,41 @@
           data: params
         }).then(res => {
           if (res.code == 200) {
+            let { user_name, gender, mobile, email, account } = res.data.user
+            this.form.username = user_name
+            this.form.usersex = gender
+            this.form.userphone = mobile
+            this.form.useremail = email
+            this.form.useraccount = account
+          }
+        })
+      },
+      openUpdateDialog () {
+        this.editDialogFormVisible = true
+
+        this.editForm.username = this.form.username
+        this.editForm.usersex = this.form.usersex
+        this.editForm.userphone = this.form.userphone
+        this.editForm.useremail = this.form.useremail
+        this.editForm.useraccount = this.form.useraccount
+      },
+      updateUserInfo () {
+        let params = {
+          id: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          user_name: this.editForm.username,
+          gender: this.editForm.usersex,
+          mobile: this.editForm.userphone,
+          email: this.editForm.useremail
+        }
+        request({
+          url: '/escalice/admin/account/edit',
+          method: 'post',
+          data: params
+        }).then(res => {
+          if (res.code == 200) {
+            this.editDialogFormVisible = false
+            this.initUserInfo()
+            this.$message({ type: 'success', message: '修改成功' })
           }
         })
       },
@@ -142,7 +217,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let params = {
-              id: '11ea-2f09-b8b8-70188b39697a-b8725543',
+              user_id: '11ea-2f09-b8b8-70188b39697a-b8725543',
               old_password: this.ruleForm.oldPass,
               new_password: this.ruleForm.checkPass
             }
@@ -152,6 +227,10 @@
               data: params
             }).then(res => {
               if (res.code == 200) {
+                this.dialogFormVisible = false
+                this.$message({ type: 'success', message: '密码修改成功' })
+              } else if (res.code == 100) {
+                this.$message({ type: 'warning', message: res.msg })
               }
             })
           } else {
