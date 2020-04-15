@@ -218,7 +218,7 @@
     },
     methods: {
       toApplyPage (name, id) {
-        this.$router.push({ name: 'workflow_qjsq', params: { apply_name: name, apply_id: id } })
+        this.$router.push({ name: 'workflow', params: { apply_name: name, apply_id: id } })
       },
       handleDateChange () {
         this.getData();

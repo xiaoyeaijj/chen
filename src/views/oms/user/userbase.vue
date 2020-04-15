@@ -1,362 +1,176 @@
 <template> 
   <div class="app-container">
-    <el-card class="filter-container" shadow="never">
-      <div>
-        <i class="el-icon-search"></i>
-        <span>筛选搜索</span>
-        <el-button
-          style="float:right"
-          type="primary"
-          @click="handleSearchList()"
-          size="small">
-          查询搜索
-        </el-button>
-        <el-button
-          style="float:right;margin-right: 15px"
-          @click="handleResetSearch()"
-          size="small">
-          重置
-        </el-button>
-      </div>
-      <div style="margin-top: 15px">
-        <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="输入搜索：">
-            <el-input v-model="search.keyword" class="input-width" placeholder="真实名字，手机号"></el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-card>
-    <el-card class="operate-container" shadow="never">
+    <el-card class="operate-container"
+             shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>人员列表</span>
-      <!--<el-button
-        size="mini"
-        @click="handleAdd"
-        class="btn-add">添加
-      </el-button>-->
+      <span>个人信息展示页</span>
     </el-card>
-    <div class="table-container">
-      <el-table ref="returnApplyTable"
-                :data="list"
-                style="width: 100%;"
-                @selection-change="handleSelectionChange"
-                v-loading="listLoading" border>
-        <el-table-column label="用户id" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
-        </el-table-column>
-        <el-table-column label="真实名字" align="center">
-          <template slot-scope="scope">{{scope.row.real_name}}</template>
-        </el-table-column>
-        <el-table-column label="学生号" align="center">
-          <template slot-scope="scope">{{scope.row.student_id }}</template>
-        </el-table-column>
-        <el-table-column label="性别" align="center">
-          <template slot-scope="scope">{{scope.row.gender }}</template>
-        </el-table-column>
-        <el-table-column label="昵称" align="center">
-          <template slot-scope="scope">{{scope.row.nick_name}}</template>
-        </el-table-column>
-        <el-table-column label="手机" align="center">
-          <template slot-scope="scope">{{scope.row.mobile}}</template>
-        </el-table-column>
-        <el-table-column label="省份" align="center">
-          <template slot-scope="scope">{{scope.row.province}}</template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.create_date}}</template>
-        </el-table-column>
-        <el-table-column label="操作" width="160" align="center">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
-            <el-button
-              size="mini"
-              @click="deleteReason(scope.$index, scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <!--    <div class="batch-operate-container">-->
-    <!--      <el-select-->
-    <!--        size="small"-->
-    <!--        v-model="operateType" placeholder="批量操作">-->
-    <!--        <el-option-->
-    <!--          v-for="item in operateOptions"-->
-    <!--          :key="item.value"-->
-    <!--          :label="item.label"-->
-    <!--          :value="item.value">-->
-    <!--        </el-option>-->
-    <!--      </el-select>-->
-    <!--      <el-button-->
-    <!--        style="margin-left: 20px"-->
-    <!--        class="search-button"-->
-    <!--        @click="handleBatchOperate"-->
-    <!--        type="primary"-->
-    <!--        size="small">-->
-    <!--        确定-->
-    <!--      </el-button>-->
-    <!--    </div>-->
-    <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
-        :current-page.sync="listQuery.pageNum"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :total="total">
-      </el-pagination>
-    </div>
-    <el-dialog
-      title="编辑人员信息"
-      :visible.sync="dialogVisible" width="50%">
-      <el-form :model="returnReason"
-               ref="reasonForm" label-width="150px">
-        <el-form-item label="真实名字：">
-          <el-input v-model="returnReason.real_name" class="input-width"></el-input>
+    <el-form ref="form"
+             style="margin-top:20px;"
+             :model="form"
+             label-width="80px">
+      <el-form-item label="用户姓名">
+        <el-input disabled
+                  v-model="form.username"></el-input>
+      </el-form-item>
+      <el-form-item label="用户性别">
+        <el-input disabled
+                  v-model="form.usersex"></el-input>
+      </el-form-item>
+      <el-form-item label="用户电话">
+        <el-input disabled
+                  v-model="form.userphone"></el-input>
+      </el-form-item>
+      <el-form-item label="用户邮箱">
+        <el-input disabled
+                  v-model="form.useremail"></el-input>
+      </el-form-item>
+      <el-form-item label="用户账号">
+        <el-input disabled
+                  v-model="form.useraccount"></el-input>
+      </el-form-item>
+      <el-button type="primary"
+                 @click="onSubmit">修改资料</el-button>
+      <el-button type="primary"
+                 @click="dialogFormVisible = true">修改密码</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-dialog title="收货地址"
+               :visible.sync="dialogFormVisible">
+      <el-form :model="ruleForm"
+               status-icon
+               :rules="rules"
+               ref="ruleForm"
+               label-width="100px"
+               class="demo-ruleForm">
+        <el-form-item label="旧密码"
+                      prop="oldPass">
+          <el-input type="password"
+                    v-model="ruleForm.oldPass"
+                    autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="所在大学：">
-          <el-input v-model="returnReason.college" class="input-width"></el-input>
+        <el-form-item label="密码"
+                      prop="pass">
+          <el-input type="password"
+                    v-model="ruleForm.pass"
+                    autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="学生号码：">
-          <el-input v-model="returnReason.student_id" class="input-width"></el-input>
+        <el-form-item label="确认密码"
+                      prop="checkPass">
+          <el-input type="password"
+                    v-model="ruleForm.checkPass"
+                    autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="手机号码：">
-          <el-input v-model="returnReason.mobile" class="input-width"></el-input>
+        <el-form-item>
+          <el-button type="primary"
+                     @click="passwordUpdate('ruleForm')">提交</el-button>
+          <el-button type="primary"
+                     @click="resetForm('ruleForm')">重置</el-button>
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleConfirm">确 定</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
 <script>
-  import {formatDate} from '@/utils/date';
-  import {fetchList,deleteApply,updateReason,addReason,SearchList} from '@/api/userBase';
-  import {deleteReason} from "../../../api/userBase";
-  const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
-    id: null,
-    receiverKeyword: null,
-    status: null,
-    createTime: null,
-    handleMan: null,
-    handleTime: null
-  };
-  const defaultReturnReason = {
-    student_id:"",
-    real_name:"",
-    mobile:"",
-    college:"",
-  };
-  const defaultStatusOptions=[
-    {
-      label: '益禾堂',
-      value: "11ea-2ef5-8d58-70188b39697a-44a2fd0e"
-    },
-    {
-      label: '码头1978',
-      value: "11ea-2f7f-ba88-70188b39697a-58316328"
-    },
-    {
-      label: '铁饭碗',
-      value: "11ea-2f7f-ba88-70188b39697a-9c44af25"
-    },
-    {
-      label: '韩拾林',
-      value: "11ea-2f7f-ba88-70188b39697a-d1641846"
-    }
-  ];
+  import request from '@/utils/request'
   export default {
-    name:'returnApplyList',
-    data() {
-      return {
-        search:{
-          keyword:""
-        },
-        listQuery:Object.assign({},defaultListQuery),
-        statusOptions: Object.assign({},defaultStatusOptions),
-        list:null,
-        total:null,
-        listLoading:false,
-        multipleSelection:[],
-        operateType:1,
-        operateOptions: [
-          {
-            label: "批量删除",
-            value: 1
+    name: 'returnApplyList',
+    data () {
+      var validatePass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else {
+          if (this.ruleForm.checkPass !== '') {
+            this.$refs.ruleForm.validateField('checkPass');
           }
-        ],
-        dialogVisible:false,
-        returnReason:Object.assign({},defaultReturnReason),
+          callback();
+        }
+      };
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.ruleForm.pass) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
+      return {
+        form: {
+          username: '陈线截',
+          usersex: '男',
+          userphone: '13812346589',
+          useremail: 'chen@heywoods.cn',
+          useraccount: 'student'
+        },
+        dialogFormVisible: false,
+        ruleForm: {
+          oldPass: '',
+          pass: '',
+          checkPass: ''
+        },
+        rules: {
+          pass: [
+            { validator: validatePass, trigger: 'blur' }
+          ],
+          checkPass: [
+            { validator: validatePass2, trigger: 'blur' }
+          ]
+        }
       }
     },
-    created(){
+    created () {
       this.getList();
     },
-    filters:{
-      formatTime(time) {
-        if(time==null||time===''){
-          return 'N/A';
+    methods: {
+      getList () {
+        let params = {
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543'
         }
-        let date = new Date(time);
-        return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
-      },
-      formatStatus(status){
-        for(let i=0;i<defaultStatusOptions.length;i++){
-          if(status===defaultStatusOptions[i].value){
-            return defaultStatusOptions[i].label;
+        request({
+          url: '/escalice/admin/account/recode',
+          method: 'post',
+          data: params
+        }).then(res => {
+          if (res.code == 200) {
           }
-        }
-      },
-      formatReturnAmount(row){
-        return row.productRealPrice*row.productCount;
-      }
-    },
-    methods:{
-      handleAdd() {
-        this.dialogVisible=true;
-        this.operateReasonId=null;
-        this.returnReason=Object.assign({},defaultReturnReason);
-      },
-      handleSelectionChange(val){
-        this.multipleSelection = val;
-      },
-      handleResetSearch() {
-        this.listQuery = Object.assign({}, defaultListQuery);
-      },
-      handleSearchList() {
-        this.listQuery.pageNum = 1;
-        this.getList();
-      },
-      handleViewDetail(index,row){
-        this.$router.push({path:'/oms/returnApplyDetail',query:{id:row.id}})
-      },
-      // handleBatchOperate(){
-      //   if(this.multipleSelection==null||this.multipleSelection.length<1){
-      //     this.$message({
-      //       message: '请选择要操作的申请',
-      //       type: 'warning',
-      //       duration: 1000
-      //     });
-      //     return;
-      //   }
-      //   if(this.operateType===1){
-      //     //批量删除
-      //     this.$confirm('是否要进行删除操作?', '提示', {
-      //       confirmButtonText: '确定',
-      //       cancelButtonText: '取消',
-      //       type: 'warning'
-      //     }).then(() => {
-      //       let params = new URLSearchParams();
-      //       let ids=[];
-      //       for(let i=0;i<this.multipleSelection.length;i++){
-      //         ids.push(this.multipleSelection[i].id);
-      //       }
-      //       params.append("ids",ids);
-      //       deleteApply(params).then(response=>{
-      //         this.getList();
-      //         this.$message({
-      //           type: 'success',
-      //           message: '删除成功!'
-      //         });
-      //       });
-      //     })
-      //   }
-      // },
-      handleSizeChange(val){
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
-      },
-      handleUpdate(index, row){
-        this.dialogVisible=true;
-        this.operateReasonId=row.id;
-        this.returnReason=row;
-
-      },
-      handleConfirm(){
-        if(this.operateReasonId==null){
-          //添加操作
-          addReason(this.returnReason).then(response=>{
-            this.dialogVisible=false;
-            this.operateReasonId=null;
-            this.$message({
-              message: '添加成功！',
-              type: 'success',
-              duration:1000
-            });
-            this.getList();
-          });
-        }else{
-          //编辑操作
-
-          updateReason(this.returnReason).then(response=>{
-            this.dialogVisible=false;
-            this.operateReasonId=null;
-            this.$message({
-              message: '修改成功！',
-              type: 'success',
-              duration:1000
-            });
-            this.getList();
-          });
-        }
-      },
-      handleCurrentChange(val){
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
-      getList(){
-        this.listLoading=true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
-      },
-      handleSearchList() {
-
-
-        SearchList(this.search).then(response=>{
-          this.list=response.data.list;
-
-        });
-
-      },
-      deleteReason(index, row){
-        this.$confirm('是否要进行该删除操作?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-
-          deleteReason(row).then(response=>{
-            this.$message({
-              message: '删除成功！',
-              type: 'success',
-              duration: 1000
-            });
-
-            this.getList();
-          });
         })
       },
+      passwordUpdate (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let params = {
+              id: '11ea-2f09-b8b8-70188b39697a-b8725543',
+              old_password: this.ruleForm.oldPass,
+              new_password: this.ruleForm.checkPass
+            }
+            request({
+              url: '/escalice/admin/account/update',
+              method: 'post',
+              data: params
+            }).then(res => {
+              if (res.code == 200) {
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      resetForm (formName) {
+        this.$refs[formName].resetFields();
+      }
     }
   }
 
 </script>
 <style scoped>
-
   .input-width {
     width: 203px;
   }
-
 </style>
 
 

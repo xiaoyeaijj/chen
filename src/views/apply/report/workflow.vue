@@ -3,11 +3,10 @@
     <el-card class="operate-container"
              shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>请假申请</span>
+      <span>{{this.$route.params.apply_name}}</span>
     </el-card>
     <el-form ref="form"
              :model="form"
-             :rules="rules"
              label-width="80px"
              style="margin-top:20px;">
       <el-form-item label="申请人">

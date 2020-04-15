@@ -26,10 +26,24 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/home',
     name: 'home',
+    meta: { title: '首页', icon: 'home' },
     children: [{
       path: 'home',
       component: () => import('@/views/home/index'),
       meta: { title: '首页', icon: 'home' }
+    }]
+  },
+  {
+    path: '/apply/report',
+    component: Layout,
+    redirect: '/apply/report/workflow',
+    name: 'apply',
+    meta: { title: '发起申请', icon: 'table' },
+    children: [{
+      path: 'workflow',
+      name: 'workflow',
+      component: () => import('@/views/apply/report/workflow'),
+      meta: { title: '发起申请', icon: 'table' }
     }]
   },
   {
@@ -43,7 +57,7 @@ export const constantRouterMap = [
         path: 'workflow_qjsq',
         name: 'workflow_qjsq',
         component: () => import('@/views/oms/report/workflow-QJ'),
-        meta: { title: '发起申请', icon: 'sms-hot' }
+        meta: { title: '请假申请', icon: 'sms-hot' }
       },
       {
         path: 'workflow_hdsq',
@@ -72,66 +86,23 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/escalice/shop/user_base_list',
     name: 'user',
-    meta: { title: '人员管理', icon: 'user' },
+    meta: { title: '用户管理', icon: 'user' },
     children: [
       {
         path: 'user_base_list',
         name: 'user_base_list',
         component: () => import('@/views/oms/user/userbase'),
-        meta: { title: '人员列表', icon: 'product-list' }
+        meta: { title: '个人信息', icon: 'product-list' }
       },
       {
         path: 'sys_user_list',
         name: 'sys_user_list',
         component: () => import('@/views/oms/order/setting'),
-        meta: { title: '系统人员', icon: 'sms-subject' }
+        meta: { title: '用户列表', icon: 'sms-subject' }
       }
     ]
   },
 
-  // {
-  //   path: '/promotion/sale',
-  //   component: Layout,
-  //   redirect: '/promotion/sale/coupon_list',
-  //   name: 'sale',
-  //   meta: {title: '营销管理', icon: 'sms-coupon'},
-  //   children: [
-  //     {
-  //       path: 'coupon_list',
-  //       name: 'coupon_list',
-  //       component: () => import('@/views/oms/apply/index'),
-  //       meta: {title: '折扣列表', icon: 'order-return'}
-  //     },
-  //     {
-  //       path: 'pre_order_list',
-  //       name: 'pre_order_list',
-  //       component: () => import('@/views/oms/preorder/preshop'),
-  //       meta: {title: '预定管理', icon: 'sms-flash'}
-  //     }
-  //   ]
-  // },
-  //
-  // {
-  //   path: '/promotion/sale',
-  //   component: Layout,
-  //   redirect: '/promotion/post/coupon_list',
-  //   name: 'post',
-  //   meta: {title: '社区管理', icon: 'example'},
-  //   children: [
-  //     {
-  //       path: 'coupon_list',
-  //       name: 'coupon_list',
-  //       component: () => import('@/views/oms/apply/index'),
-  //       meta: {title: '帖子管理', icon: 'order'}
-  //     },
-  //     {
-  //       path: 'pre_order_list',
-  //       name: 'pre_order_list',
-  //       component: () => import('@/views/oms/preorder/preshop'),
-  //       meta: {title: '专题推荐', icon: 'sms-ad'}
-  //     }
-  //   ]
-  // },
 
   { path: '*', redirect: '/404', hidden: true }
 ]
