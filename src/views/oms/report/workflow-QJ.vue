@@ -7,6 +7,7 @@
     </el-card>
     <el-form ref="form"
              :model="form"
+             :rules="rules"
              label-width="80px"
              style="margin-top:20px;">
       <el-form-item label="申请人">
@@ -41,7 +42,7 @@
       <el-form-item>
         <el-button type="primary"
                    @click="onSubmit">提交申请</el-button>
-        <el-button>取消</el-button>
+        <el-button @click="cancel">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -57,7 +58,7 @@
           date: '',
           time: '',
           desc: ''
-        }
+        },
       }
     },
     created () {
@@ -66,6 +67,22 @@
     },
     methods: {
       onSubmit () {
+        if (!this.form.name) {
+          this.$message({ type: 'warning', message: '请填写申请人' })
+          return
+        }
+        if (!this.form.date) {
+          this.$message({ type: 'warning', message: '请选择申请日期' })
+          return
+        }
+        if (!this.form.time) {
+          this.$message({ type: 'warning', message: '请选择申请时间' })
+          return
+        }
+        if (!this.form.desc) {
+          this.$message({ type: 'warning', message: '请填写申请原因' })
+          return
+        }
         let apply_detail = {
           apply_name: this.form.name,
           apply_date: this.form.date,
@@ -87,6 +104,12 @@
             this.$message({ type: 'success', message: '提交申请成功' })
           }
         })
+      },
+      cancel () {
+        this.form.name = ''
+        this.form.date = ''
+        this.form.time = ''
+        this.form.desc = ''
       }
     }
   }
