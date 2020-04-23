@@ -96,7 +96,7 @@ export const constantRouterMap = [
       {
         path: 'sys_user_list',
         name: 'sys_user_list',
-        component: () => import('@/views/oms/order/setting'),
+        component: () => import('@/views/oms/user/userlist'),
         meta: { title: '用户列表', icon: 'sms-subject' }
       },
       {
