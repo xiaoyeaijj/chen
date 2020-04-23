@@ -91,14 +91,25 @@
           wfcode: 'HDSQ'
         }
         request({
-          url: '/escalice/admin/WorkflowInstance/tomylist',
+          url: '/escalice/admin/WorkflowInstance/bymylist',
           method: 'post',
           data: params
         }).then(res => {
           if (res.code == 200) {
+
           }
         })
-      }
+      },
+
+      handleSizeChange (val) {
+        this.listQuery.pageNum = 1;
+        this.listQuery.pageSize = val;
+        this.getList();
+      },
+      handleCurrentChange (val) {
+        this.listQuery.pageNum = val;
+        this.getList();
+      },
     }
   }
 

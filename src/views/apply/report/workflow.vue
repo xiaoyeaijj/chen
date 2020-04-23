@@ -28,8 +28,8 @@
                           is-range
                           value-format="HH:mm:ss"
                           range-separator="至"
-                          start-placeholder="开始时间"
-                          end-placeholder="结束时间"
+                          start-placeholder="申请第一天开始时间"
+                          end-placeholder="申请最后一天结束时间"
                           placeholder="选择时间范围"
                           style="width: 100%;"></el-time-picker>
         </el-col>
