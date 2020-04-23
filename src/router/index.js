@@ -78,8 +78,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
-
   {
     path: '/escalice/user',
     component: Layout,
@@ -104,6 +102,27 @@ export const constantRouterMap = [
         name: 'add_user',
         component: () => import('@/views/oms/user/adduser'),
         meta: { title: '添加用户', icon: 'product-list' }
+      }
+    ]
+  },
+  {
+    path: '/escalice/feedback',
+    component: Layout,
+    redirect: '/escalice/feedback',
+    name: 'feedback',
+    meta: { title: '反馈评价', icon: 'user' },
+    children: [
+      {
+        path: 'feedback',
+        name: 'feedback',
+        component: () => import('@/views/oms/feedback/feedback'),
+        meta: { title: '反馈', icon: 'product-list' }
+      },
+      {
+        path: 'appraise',
+        name: 'appraise',
+        component: () => import('@/views/oms/feedback/appraise'),
+        meta: { title: '评价', icon: 'sms-subject' }
       }
     ]
   },

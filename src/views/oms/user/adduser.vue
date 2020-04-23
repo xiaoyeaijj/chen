@@ -8,7 +8,7 @@
         <el-form ref="form"
                  style="margin-top:20px;"
                  :model="form"
-                 label-width="80px">
+                 label-width="120px">
             <el-form-item label="用户账号">
                 <el-input v-model="form.useraccount"></el-input>
             </el-form-item>
