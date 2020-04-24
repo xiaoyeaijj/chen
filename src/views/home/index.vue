@@ -17,76 +17,25 @@
     </div>
     <div class="un-handle-layout">
       <div class="layout-title">待审批事务</div>
-      <div class="un-handle-content">
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">讨论帖处理</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">门店类型申请</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">高校合作申请</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">无效优惠券</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">新优惠券登记</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">待发放优惠券</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">新商店申请</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">异常积分用户</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">广告合作申请</span>
-              <span style="float: right"
-                    class="color-danger">(10)</span>
-            </div>
-          </el-col>
-        </el-row>
+      <div class="table-container">
+        <el-table ref="returnApplyTable"
+                  :data="list"
+                  style="width: 100%;"
+                  v-loading="listLoading"
+                  border>
+          <el-table-column label="申请人"
+                           align="center">
+            <template slot-scope="scope">{{scope.row.data_json.apply_name}}</template>
+          </el-table-column>
+          <el-table-column label="申请类型"
+                           align="center">
+            <template slot-scope="scope">{{scope.row.wf_name}}</template>
+          </el-table-column>
+          <el-table-column label="申请状态"
+                           align="center">
+            <template slot-scope="scope">{{scope.row.verf_statue}}</template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
     <div class="overview-layout">
@@ -95,26 +44,7 @@
           <div class="out-border">
             <div class="layout-title">公告详情</div>
             <div style="padding: 40px">
-              <el-row>
-                <el-col :span="6"
-                        class="color-danger overview-item-value">100</el-col>
-                <el-col :span="6"
-                        class="color-danger overview-item-value">400</el-col>
-                <el-col :span="6"
-                        class="color-danger overview-item-value">50</el-col>
-                <el-col :span="6"
-                        class="color-danger overview-item-value">500</el-col>
-              </el-row>
-              <el-row class="font-medium">
-                <el-col :span="6"
-                        class="overview-item-title">已下架</el-col>
-                <el-col :span="6"
-                        class="overview-item-title">已上架</el-col>
-                <el-col :span="6"
-                        class="overview-item-title">紧张</el-col>
-                <el-col :span="6"
-                        class="overview-item-title">全部</el-col>
-              </el-row>
+              暂无公告
             </div>
           </div>
         </el-col>
@@ -124,30 +54,7 @@
 </template>
 
 <script>
-  import { str2Date } from '@/utils/date';
-  import img_home_order from '@/assets/images/home_order.png';
-  import img_home_today_amount from '@/assets/images/home_today_amount.png';
-  import img_home_yesterday_amount from '@/assets/images/home_yesterday_amount.png';
-  const DATA_FROM_BACKEND = {
-    columns: ['date', 'orderCount', 'orderAmount'],
-    rows: [
-      { date: '2020-1-01', orderCount: 200, orderAmount: 1093 },
-      { date: '2020-1-02', orderCount: 400, orderAmount: 2230 },
-      { date: '2020-1-03', orderCount: 600, orderAmount: 3623 },
-      { date: '2020-1-04', orderCount: 700, orderAmount: 6423 },
-      { date: '2020-1-05', orderCount: 800, orderAmount: 8492 },
-      { date: '2020-1-06', orderCount: 1000, orderAmount: 6293 },
-      { date: '2020-1-07', orderCount: 500, orderAmount: 2293 },
-      { date: '2020-1-08', orderCount: 300, orderAmount: 6293 },
-      { date: '2020-1-09', orderCount: 500, orderAmount: 5293 },
-      { date: '2020-1-10', orderCount: 400, orderAmount: 3293 },
-      { date: '2020-1-11', orderCount: 300, orderAmount: 2293 },
-      { date: '2020-1-12', orderCount: 900, orderAmount: 8293 },
-      { date: '2020-1-13', orderCount: 1000, orderAmount: 10293 },
-      { date: '2020-1-14', orderCount: 100, orderAmount: 1293 },
-      { date: '2020-1-15', orderCount: 500, orderAmount: 4293 }
-    ]
-  };
+  import request from '@/utils/request'
   export default {
     name: 'home',
     data () {
@@ -170,87 +77,41 @@
             apply_id: '58f8cd08-f7ce-1dcb-bb2e-1aa71a307c25'
           }
         ],
-        pickerOptions: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick (picker) {
-              const end = new Date();
-              let start = new Date();
-              start.setFullYear(2019);
-              start.setMonth(12);
-              start.setDate(1);
-              end.setTime(start.getTime() + 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一月',
-            onClick (picker) {
-              const end = new Date();
-              let start = new Date();
-              start.setFullYear(2019);
-              start.setMonth(12);
-              start.setDate(1);
-              end.setTime(start.getTime() + 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
-        },
-        orderCountDate: '',
-        chartSettings: {
-          xAxisType: 'time',
-          area: true,
-          axisSite: { right: ['orderAmount'] },
-          labelMap: { 'orderCount': '好评数量', 'orderAmount': '预定数量' }        },
-        chartData: {
-          columns: [],
-          rows: []
-        },
-        loading: false,
-        dataEmpty: false,
-        img_home_order,
-        img_home_today_amount,
-        img_home_yesterday_amount
+        listLoading: false,
+        list: []
       }
     },
     created () {
-      this.initOrderCountDate();
-      this.getData();
+      this.getList();
     },
     methods: {
       toApplyPage (name, id) {
         this.$router.push({ name: 'workflow', params: { apply_name: name, apply_id: id } })
       },
-      handleDateChange () {
-        this.getData();
-      },
-      initOrderCountDate () {
-        let start = new Date();
-        start.setFullYear(2019);
-        start.setMonth(12);
-        start.setDate(1);
-        const end = new Date();
-        end.setTime(start.getTime() + 1000 * 60 * 60 * 24 * 7);
-        this.orderCountDate = [start, end];
-      },
-      getData () {
-        setTimeout(() => {
-          this.chartData = {
-            columns: ['date', 'orderCount', 'orderAmount'],
-            rows: []
-          };
-          for (let i = 0; i < DATA_FROM_BACKEND.rows.length; i++) {
-            let item = DATA_FROM_BACKEND.rows[i];
-            let currDate = str2Date(item.date);
-            let start = this.orderCountDate[0];
-            let end = this.orderCountDate[1];
-            if (currDate.getTime() >= start.getTime() && currDate.getTime() <= end.getTime()) {
-              this.chartData.rows.push(item);
+      getList () {
+        let self = this
+        self.listLoading = true
+        let params = {
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          wfcode: 'all'
+        }
+        request({
+          url: '/escalice/admin/WorkflowInstance/bymylist',
+          method: 'post',
+          data: params
+        }).then(res => {
+          if (res.code == 200) {
+            self.listLoading = false
+            let datalist = res.data.list
+            if (datalist && datalist.length > 0) {
+              datalist.map(item => {
+                item.data_json = JSON.parse(item.data_json)
+              })
             }
+            self.list = datalist
           }
-          this.dataEmpty = false;
-          this.loading = false
-        }, 1000)
-      }
+        })
+      },
     }
   }
 </script>
