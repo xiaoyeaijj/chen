@@ -9,76 +9,54 @@
       <el-table ref="returnApplyTable"
                 :data="list"
                 style="width: 100%;"
-                @selection-change="handleSelectionChange"
                 v-loading="listLoading"
                 border>
-        <el-table-column label="活动名称"
-                         width="80"
+        <el-table-column label="流程id"
                          align="center">
-          <template slot-scope="scope">{{scope.row.rank}}</template>
+          <template slot-scope="scope">{{scope.row.wf_id}}</template>
         </el-table-column>
-        <el-table-column label="申请人"
+        <el-table-column label="发起人"
                          align="center">
-          <template slot-scope="scope">{{scope.row.shop_name}}</template>
+          <template slot-scope="scope">{{scope.row.data_json.apply_name}}</template>
         </el-table-column>
         <el-table-column label="申请时间"
                          align="center">
-          <template slot-scope="scope">{{scope.row.shop_pic}}</template>
+          <template slot-scope="scope">{{scope.row.data_json.apply_date[0]}} {{scope.row.data_json.apply_time[0]}} 至 {{scope.row.data_json.apply_date[1]}} {{scope.row.data_json.apply_time[1]}}</template>
+        </el-table-column>
+        <el-table-column label="申请原因"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.data_json.apply_name}}</template>
+        </el-table-column>
+        <el-table-column label="申请类型"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.wf_name}}</template>
+        </el-table-column>
+        <el-table-column label="申请状态"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.verf_statue}}</template>
+        </el-table-column>
+        <el-table-column label="操作"
+                         width="160"
+                         align="center">
+          <template slot-scope="scope">
+            <el-button size="mini"
+                       @click="handlePass(scope.row)">通过</el-button>
+            <el-button size="mini"
+                       @click="handleReject(scope.row)">驳回</el-button>
+          </template>
         </el-table-column>
       </el-table>
-    </div>
-    <div class="pagination-container">
-      <el-pagination background
-                     @size-change="handleSizeChange"
-                     @current-change="handleCurrentChange"
-                     layout="total, sizes,prev, pager, next,jumper"
-                     :current-page.sync="listQuery.pageNum"
-                     :page-size="listQuery.pageSize"
-                     :page-sizes="[5,10,15]"
-                     :total="total">
-      </el-pagination>
     </div>
   </div>
 </template>
 <script>
   import request from '@/utils/request'
-  const defaultListQuery = {
-    pageNum: 1,
-    pageSize: 10,
-    id: null,
-    receiverKeyword: null,
-    status: null,
-    createTime: null,
-    handleMan: null,
-    handleTime: null
-  };
-  const defaultReturnReason = {
-    student_id: "",
-    real_name: "",
-    mobile: "",
-    college: "",
-  };
   export default {
     name: 'returnApplyList',
     data () {
       return {
-        search: {
-          keyword: ""
-        },
-        listQuery: Object.assign({}, defaultListQuery),
         list: null,
-        total: null,
         listLoading: false,
-        multipleSelection: [],
-        operateType: 1,
-        operateOptions: [
-          {
-            label: "批量删除",
-            value: 1
-          }
-        ],
-        dialogVisible: false,
-        returnReason: Object.assign({}, defaultReturnReason),
       }
     },
     created () {
@@ -86,6 +64,8 @@
     },
     methods: {
       getList () {
+        let self = this
+        self.listLoading = true
         let params = {
           userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
           wfcode: 'HDSQ'
@@ -96,20 +76,48 @@
           data: params
         }).then(res => {
           if (res.code == 200) {
-
+            self.listLoading = false
+            let datalist = res.data.list
+            if (datalist && datalist.length > 0) {
+              datalist.map(item => {
+                item.data_json = JSON.parse(item.data_json)
+              })
+            }
+            self.list = datalist
           }
         })
       },
-
-      handleSizeChange (val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
+      handlePass (row) {
+        let self = this
+        let params = {
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          instanceid: row.id,
+          verify: 1
+        }
+        request({
+          url: '/escalice/admin/WorkflowInstance/verify',
+          method: 'post',
+          data: params
+        }).then(res => {
+          this.$message({ type: 'success', message: '已通过' })
+          self.getList();
+        })
       },
-      handleCurrentChange (val) {
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
+      handleReject (row) {
+        let params = {
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          instanceid: row.id,
+          verify: 0
+        }
+        request({
+          url: '/escalice/admin/WorkflowInstance/verify',
+          method: 'post',
+          data: params
+        }).then(res => {
+          this.$message({ type: 'success', message: '已驳回' })
+          self.getList();
+        })
+      }
     }
   }
 

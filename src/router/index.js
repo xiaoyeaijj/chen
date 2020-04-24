@@ -35,13 +35,13 @@ export const constantRouterMap = [
   {
     path: '/apply/report',
     component: Layout,
-    redirect: '/apply/report/workflow',
+    redirect: '/apply/workflow',
     name: 'apply',
     meta: { title: '发起申请', icon: 'table' },
     children: [{
       path: 'workflow',
       name: 'workflow',
-      component: () => import('@/views/apply/report/workflow'),
+      component: () => import('@/views/apply/workflow'),
       meta: { title: '发起申请', icon: 'table' }
     }]
   },

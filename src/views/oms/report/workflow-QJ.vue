@@ -3,48 +3,50 @@
     <el-card class="operate-container"
              shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>请假申请</span>
+      <span>请假申请详情</span>
     </el-card>
-    <el-form ref="form"
-             :model="form"
-             :rules="rules"
-             label-width="80px"
-             style="margin-top:20px;">
-      <el-form-item label="申请人">
-        <el-input v-model="form.name"></el-input>
-      </el-form-item>
-      <el-form-item label="申请时间">
-        <el-col :span="8">
-          <el-date-picker placeholder="选择日期"
-                          v-model="form.date"
-                          type="daterange"
-                          value-format="yyyy-MM-dd"
-                          range-separator="至"
-                          start-placeholder="开始日期"
-                          end-placeholder="结束日期"
-                          style="width: 100%;"></el-date-picker>
-        </el-col>
-        <el-col :span="8">
-          <el-time-picker v-model="form.time"
-                          is-range
-                          value-format="HH:mm:ss"
-                          range-separator="至"
-                          start-placeholder="开始时间"
-                          end-placeholder="结束时间"
-                          placeholder="选择时间范围"
-                          style="width: 100%;"></el-time-picker>
-        </el-col>
-      </el-form-item>
-      <el-form-item label="申请原因">
-        <el-input type="textarea"
-                  v-model="form.desc"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary"
-                   @click="onSubmit">提交申请</el-button>
-        <el-button @click="cancel">取消</el-button>
-      </el-form-item>
-    </el-form>
+    <div class="table-container">
+      <el-table ref="returnApplyTable"
+                :data="list"
+                style="width: 100%;"
+                v-loading="listLoading"
+                border>
+        <el-table-column label="流程id"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.wf_id}}</template>
+        </el-table-column>
+        <el-table-column label="发起人"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.data_json.apply_name}}</template>
+        </el-table-column>
+        <el-table-column label="申请时间"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.data_json.apply_date[0]}} {{scope.row.data_json.apply_time[0]}} 至 {{scope.row.data_json.apply_date[1]}} {{scope.row.data_json.apply_time[1]}}</template>
+        </el-table-column>
+        <el-table-column label="申请原因"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.data_json.apply_name}}</template>
+        </el-table-column>
+        <el-table-column label="申请类型"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.wf_name}}</template>
+        </el-table-column>
+        <el-table-column label="申请状态"
+                         align="center">
+          <template slot-scope="scope">{{scope.row.verf_statue}}</template>
+        </el-table-column>
+        <el-table-column label="操作"
+                         width="160"
+                         align="center">
+          <template slot-scope="scope">
+            <el-button size="mini"
+                       @click="handlePass(scope.row)">通过</el-button>
+            <el-button size="mini"
+                       @click="handleReject(scope.row)">驳回</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 <script>
@@ -53,63 +55,68 @@
     name: 'returnApplyList',
     data () {
       return {
-        form: {
-          name: '',
-          date: '',
-          time: '',
-          desc: ''
-        },
+        list: null,
+        listLoading: false,
       }
     },
     created () {
-    },
-    filters: {
+      this.getList();
     },
     methods: {
-      onSubmit () {
-        if (!this.form.name) {
-          this.$message({ type: 'warning', message: '请填写申请人' })
-          return
-        }
-        if (!this.form.date) {
-          this.$message({ type: 'warning', message: '请选择申请日期' })
-          return
-        }
-        if (!this.form.time) {
-          this.$message({ type: 'warning', message: '请选择申请时间' })
-          return
-        }
-        if (!this.form.desc) {
-          this.$message({ type: 'warning', message: '请填写申请原因' })
-          return
-        }
-        let apply_detail = {
-          apply_name: this.form.name,
-          apply_date: this.form.date,
-          apply_time: this.form.time,
-          apply_reason: this.form.desc
-        }
+      getList () {
+        let self = this
+        self.listLoading = true
         let params = {
-          wfid: this.$route.params.apply_id,
           userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
-          datajson: JSON.stringify(apply_detail),
-          verify: 2
+          wfcode: 'QJSQ'
         }
         request({
-          url: '/escalice/admin/WorkflowInstance/edit',
+          url: '/escalice/admin/WorkflowInstance/bymylist',
           method: 'post',
           data: params
         }).then(res => {
           if (res.code == 200) {
-            this.$message({ type: 'success', message: '提交申请成功' })
+            self.listLoading = false
+            let datalist = res.data.list
+            if (datalist && datalist.length > 0) {
+              datalist.map(item => {
+                item.data_json = JSON.parse(item.data_json)
+              })
+            }
+            self.list = datalist
           }
         })
       },
-      cancel () {
-        this.form.name = ''
-        this.form.date = ''
-        this.form.time = ''
-        this.form.desc = ''
+      handlePass (row) {
+        let self = this
+        let params = {
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          instanceid: row.id,
+          verify: 1
+        }
+        request({
+          url: '/escalice/admin/WorkflowInstance/verify',
+          method: 'post',
+          data: params
+        }).then(res => {
+          this.$message({ type: 'success', message: '已通过' })
+          self.getList();
+        })
+      },
+      handleReject (row) {
+        let params = {
+          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          instanceid: row.id,
+          verify: 0
+        }
+        request({
+          url: '/escalice/admin/WorkflowInstance/verify',
+          method: 'post',
+          data: params
+        }).then(res => {
+          this.$message({ type: 'success', message: '已驳回' })
+          self.getList();
+        })
       }
     }
   }
