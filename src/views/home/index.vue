@@ -55,6 +55,7 @@
 
 <script>
   import request from '@/utils/request'
+  import { getUserId } from '@/utils/auth' // 验权
   export default {
     name: 'home',
     data () {
@@ -91,8 +92,10 @@
       getList () {
         let self = this
         self.listLoading = true
+        let userId = getUserId()
+        console.log(userId)
         let params = {
-          userid: '11ea-2f09-b8b8-70188b39697a-b8725543',
+          userid: userId,
           wfcode: 'all'
         }
         request({
